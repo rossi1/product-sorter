@@ -44,7 +44,7 @@ go test -v
 2. Register it in the registry:
 
 ```go
-registry.RegisterStrategy("created_at", SortByCreatedAt{})
+registry.SetStrategy("created_at", SortByCreatedAt{})
 ```
 
 3. Use it:
