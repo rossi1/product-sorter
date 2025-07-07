@@ -1,6 +1,6 @@
 APP_NAME := product-sorter
 
-.PHONY: build run test docker-build docker-run clean
+.PHONY: build run test docker-build docker-run clean lint
 
 build:
 	go build -o $(APP_NAME) main.go
@@ -10,6 +10,9 @@ run: build
 
 test:
 	go test -v ./...
+
+lint:
+	golangci-lint run --timeout=3m
 
 docker-build:
 	docker build -t $(APP_NAME):latest .

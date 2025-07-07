@@ -39,11 +39,11 @@ func TestSalesPerViewSortStrategy(t *testing.T) {
 	}
 }
 
-func TestRegistryResolution(t *testing.T) {
+func TestRegistry(t *testing.T) {
 	reg := NewStrategyRegistry()
-	reg.SetStrategy("price", PriceSortStrategy{})
+	reg.SetStrategy(StrategyPrice, PriceSortStrategy{})
 
-	strategy, err := reg.GetStrategy("price")
+	strategy, err := reg.GetStrategy(StrategyPrice)
 	if err != nil {
 		t.Fatalf("Expected strategy to be found, got error: %v", err)
 	}

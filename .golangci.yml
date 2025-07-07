@@ -1,15 +1,29 @@
+version: "2"
 run:
-  timeout: 2m
+  go: "1.24"
 
 linters:
+  default: none
   enable:
     - govet
     - errcheck
-    - gofmt
-    - gosimple
+    - ineffassign
+    - misspell
+    - goconst
     - staticcheck
+    - lll
     - unused
-    - structcheck
+    - whitespace
+  
+  settings:
+    goconst:
+      min-occurrences: 2
+      min-len: 2
+    lll:
+      line-length: 140
+    misspell:
+      locale: US
 
-issues:
-  exclude-use-default: false
+formatters:
+  enable:
+    - gofmt
