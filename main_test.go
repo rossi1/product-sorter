@@ -29,13 +29,16 @@ func TestPriceSortStrategy(t *testing.T) {
 	}
 }
 
-func TestSalesPerViewSortStrategy(t *testing.T) {
-	strategy := SalesPerViewRatioSortStrategy{}
-	products := testProducts()
-	sorted := strategy.Sort(products)
+func TestSalesPerViewRatioSortStrategy(t *testing.T) {
+	reg := NewProductSortingStrategyRegistry()
+	reg.SetStrategy(StrategySalesPerViewRatio, SalesPerViewRatioSortStrategy{})
+	sortedProducts, err := reg.ExecuteStrategy(StrategySalesPerViewRatio, testProducts())
+	if err != nil {
+		t.Fatalf("Expected strategy to be found, got error: %v", err)
+	}
 
-	r1 := float64(sorted[0].SalesCount) / float64(sorted[0].ViewsCount)
-	r2 := float64(sorted[1].SalesCount) / float64(sorted[1].ViewsCount)
+	r1 := float64(sortedProducts[0].SalesCount) / float64(sortedProducts[0].ViewsCount)
+	r2 := float64(sortedProducts[1].SalesCount) / float64(sortedProducts[1].ViewsCount)
 
 	if r1 < r2 {
 		t.Errorf("Expected descending sales/view ratio but got %.4f < %.4f", r1, r2)
