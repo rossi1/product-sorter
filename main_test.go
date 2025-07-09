@@ -27,7 +27,7 @@ func TestPriceSortStrategy(t *testing.T) {
 }
 
 func TestSalesPerViewSortStrategy(t *testing.T) {
-	strategy := SalesCountSortStrategy{}
+	strategy := SalesPerViewRatioSortStrategy{}
 	products := testProducts()
 	sorted := strategy.Sort(products)
 
@@ -40,7 +40,7 @@ func TestSalesPerViewSortStrategy(t *testing.T) {
 }
 
 func TestRegistry(t *testing.T) {
-	reg := NewStrategyRegistry()
+	reg := NewProductSortingStrategyRegistry()
 	reg.SetStrategy(StrategyPrice, PriceSortStrategy{})
 
 	strategy, err := reg.GetStrategy(StrategyPrice)
@@ -55,8 +55,18 @@ func TestRegistry(t *testing.T) {
 	}
 }
 
+func TestDateSortStrategy(t *testing.T) {
+	strategy := DateSortStrategy{}
+	products := testProducts()
+	sorted := strategy.Sort(products)
+
+	if sorted[0].Created.After(sorted[1].Created) {
+		t.Errorf("Expected products to be sorted by creation date")
+	}
+}
+
 func TestUnknownStrategy(t *testing.T) {
-	reg := NewStrategyRegistry()
+	reg := NewProductSortingStrategyRegistry()
 	_, err := reg.GetStrategy("nonexistent")
 
 	if err == nil {

@@ -5,3 +5,6 @@ bin/
 *.exe
 *.test
 *.out
+
+.idea/
+*.swp
