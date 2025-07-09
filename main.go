@@ -87,12 +87,12 @@ func (r *ProductSortingStrategyRegistry) SetStrategy(key string, strategy SortSt
 	r.strategies[key] = strategy
 }
 
-func (r *ProductSortingStrategyRegistry) GetStrategy(key string) (SortStrategy, error) {
+func (r *ProductSortingStrategyRegistry) ExecuteStrategy(key string, products []*Product) ([]*Product, error) {
 	strategy, ok := r.strategies[key]
 	if !ok {
 		return nil, fmt.Errorf("strategy not found for key: %s", key)
 	}
-	return strategy, nil
+	return strategy.Sort(products), nil
 }
 
 func parseDate(s string) (time.Time, error) {
@@ -156,12 +156,11 @@ func main() {
 	registry.SetStrategy(StrategySalesPerViewRatio, SalesPerViewRatioSortStrategy{})
 	registry.SetStrategy(StrategyDate, DateSortStrategy{})
 
-	strategy, err := registry.GetStrategy(StrategySalesPerViewRatio)
+	sortedProducts, err := registry.ExecuteStrategy(StrategySalesPerViewRatio, products)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	sortedProducts := strategy.Sort(products)
 
 	fmt.Println("Sorted by Sales/View Ratio:")
 
@@ -170,12 +169,11 @@ func main() {
 			product.ID, product.Name, product.Price, product.SalesCount, product.ViewsCount)
 	}
 
-	strategy, err = registry.GetStrategy(StrategyPrice)
+	sortedProducts, err = registry.ExecuteStrategy(StrategyPrice, products)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	sortedProducts = strategy.Sort(products)
 
 	fmt.Println("Sorted by Price:")
 
@@ -184,12 +182,11 @@ func main() {
 			product.ID, product.Name, product.Price, product.SalesCount, product.ViewsCount)
 	}
 
-	strategy, err = registry.GetStrategy(StrategyDate)
+	sortedProducts, err = registry.ExecuteStrategy(StrategyDate, products)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	sortedProducts = strategy.Sort(products)
 
 	fmt.Println("Sorted by Date:")
 

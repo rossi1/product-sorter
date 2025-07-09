@@ -14,15 +14,18 @@ func testProducts() []*Product {
 }
 
 func TestPriceSortStrategy(t *testing.T) {
-	strategy := PriceSortStrategy{}
-	products := testProducts()
-	sorted := strategy.Sort(products)
-
-	if sorted[0].Price != 5 {
-		t.Errorf("Expected product with lowest price first, got %.2f", sorted[0].Price)
+	reg := NewProductSortingStrategyRegistry()
+	reg.SetStrategy(StrategyPrice, PriceSortStrategy{})
+	sortedProducts, err := reg.ExecuteStrategy(StrategyPrice, testProducts())
+	if err != nil {
+		t.Fatalf("Expected strategy to be found, got error: %v", err)
 	}
-	if sorted[2].Price != 15 {
-		t.Errorf("Expected product with highest price last, got %.2f", sorted[2].Price)
+
+	if sortedProducts[0].Price != 5 {
+		t.Errorf("Expected product with lowest price first, got %.2f", sortedProducts[0].Price)
+	}
+	if sortedProducts[2].Price != 15 {
+		t.Errorf("Expected product with highest price last, got %.2f", sortedProducts[2].Price)
 	}
 }
 
@@ -43,31 +46,32 @@ func TestRegistry(t *testing.T) {
 	reg := NewProductSortingStrategyRegistry()
 	reg.SetStrategy(StrategyPrice, PriceSortStrategy{})
 
-	strategy, err := reg.GetStrategy(StrategyPrice)
+	sortedProducts, err := reg.ExecuteStrategy(StrategyPrice, testProducts())
 	if err != nil {
 		t.Fatalf("Expected strategy to be found, got error: %v", err)
 	}
 
-	products := testProducts()
-	sorted := strategy.Sort(products)
-	if sorted[0].Price != 5 {
+	if sortedProducts[0].Price != 5 {
 		t.Errorf("Registry did not return correct strategy result")
 	}
 }
 
 func TestDateSortStrategy(t *testing.T) {
-	strategy := DateSortStrategy{}
-	products := testProducts()
-	sorted := strategy.Sort(products)
+	reg := NewProductSortingStrategyRegistry()
+	reg.SetStrategy(StrategyDate, DateSortStrategy{})
+	sortedProducts, err := reg.ExecuteStrategy(StrategyDate, testProducts())
+	if err != nil {
+		t.Fatalf("Expected strategy to be found, got error: %v", err)
+	}
 
-	if sorted[0].Created.After(sorted[1].Created) {
+	if sortedProducts[0].Created.After(sortedProducts[1].Created) {
 		t.Errorf("Expected products to be sorted by creation date")
 	}
 }
 
 func TestUnknownStrategy(t *testing.T) {
 	reg := NewProductSortingStrategyRegistry()
-	_, err := reg.GetStrategy("nonexistent")
+	_, err := reg.ExecuteStrategy("nonexistent", testProducts())
 
 	if err == nil {
 		t.Error("Expected error for unknown strategy")
